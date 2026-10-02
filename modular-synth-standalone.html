@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Modular Synth JS — Patch your own sound</title><style>
+:root{color-scheme:dark;--bg:#101719;--surface:#182225;--line:#314044;--text:#e7efea;--muted:#93a4a7;--teal:#82d7c0;--amber:#f0bc77;--red:#f0897b}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.app{max-width:1536px;margin:auto;padding:0 40px}button,input,select{font:inherit}button,select{border:1px solid var(--line);background:#202c30;color:var(--text);border-radius:7px;padding:9px 13px}button{cursor:pointer}button:hover{border-color:var(--teal);background:#293b3f}button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:3px}.primary{background:var(--teal);color:#10241e;border-color:var(--teal);font-weight:700}.primary:hover{background:#aae7d5;color:#10241e}.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:25px 0}.brand{display:flex;gap:12px;align-items:center;color:var(--text);text-decoration:none;font-weight:800;letter-spacing:2px}.logo{display:grid;place-items:center;background:var(--teal);color:#142c26;font-size:36px;line-height:1;width:46px;height:46px;border-radius:11px}.brand-sub{display:block;font-size:10px;color:var(--muted);letter-spacing:1.5px}.header-actions{display:flex;gap:10px;align-items:center}.status{font-size:12px;color:var(--muted);margin-right:12px}.status::before{content:'●';margin-right:8px;color:var(--amber)}.status.running::before{color:var(--teal)}.intro{display:flex;justify-content:space-between;align-items:center;padding:42px 0 35px}.eyebrow{font-size:10px;letter-spacing:2px;color:var(--teal);font-weight:700}h1{font-size:clamp(28px,3vw,44px);line-height:1.15;font-weight:600;letter-spacing:-1.6px;margin:14px 0}h1 span{color:var(--teal)}.intro p{color:var(--muted);margin:16px 0 0}.intro-note{display:flex;flex-direction:column;gap:9px;color:var(--muted);font-size:12px;max-width:290px}.intro-note b{color:var(--text);font-weight:500}.mini-wave{font-size:38px;letter-spacing:15px;color:var(--teal)}.toolbar{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.group{display:flex;align-items:center;gap:9px}label,.transport>span,.keyboard-tools{font-size:10px;letter-spacing:1px;color:var(--muted)}.section-label{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;letter-spacing:1.3px;margin:24px 0 15px}.section-label b{color:var(--text);font-weight:600;margin-left:8px}#message{font-size:12px;color:var(--muted);min-height:22px;margin-bottom:12px}#message.error{color:var(--red)}#rack{position:relative;background:radial-gradient(#344548 1px,transparent 1px);background-size:14px 14px;border-radius:12px;border:1px solid var(--line);padding:22px;overflow:hidden;min-height:220px}#modules{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:22px;position:relative;z-index:1}.module{background:#182225f5;border:1px solid #415154;border-radius:9px;overflow:hidden;min-width:0}.module-head{padding:14px 14px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px}.module-head h2{font-size:14px;margin:0;font-weight:600}.module-id{color:var(--muted);font-size:9px;letter-spacing:1px}.module-head .remove{background:none;border:0;padding:0 4px;color:var(--muted);font-size:20px}.module-head .remove:hover{color:var(--red)}.module[data-type="oscillator"],.module[data-type="noise"]{border-top:3px solid var(--teal)}.module[data-type="envelope"],.module[data-type="lfo"]{border-top:3px solid var(--amber)}.module[data-type="output"]{border-top:3px solid #b4a2e0}.controls{padding:13px 14px 8px}.control{margin-bottom:12px}.control-top{display:flex;justify-content:space-between;font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted)}.control output{color:var(--text);font:11px ui-monospace,SFMono-Regular,monospace;letter-spacing:0;text-transform:none}.control input{width:100%;margin:9px 0 0;accent-color:var(--teal);height:4px;cursor:pointer}.control select{width:100%;margin-top:7px;font-size:12px;padding:6px 8px}.module[data-type="envelope"] input,.module[data-type="lfo"] input{accent-color:var(--amber)}.module-desc{font-size:9px;color:var(--muted);margin:0 14px 12px}.ports{display:flex;justify-content:space-between;gap:5px;padding:12px;background:#111b1d;border-top:1px solid var(--line)}.ports-col{display:flex;flex-direction:column;gap:9px}.port{display:flex;gap:6px;align-items:center;border:0;padding:1px 2px;background:transparent;font-size:10px;color:var(--muted);border-radius:4px}.port:hover{background:#304544}.port.output{flex-direction:row-reverse}.jack{width:12px;height:12px;border:2px solid var(--teal);border-radius:50%;background:#142724;box-shadow:0 0 0 3px #82d7c013}.port.cv .jack{border-color:var(--amber);background:#33291d;box-shadow:0 0 0 3px #f0bc7713}.port.connected .jack{background:var(--teal)}.port.connected.cv .jack{background:var(--amber)}.port.selected{outline:2px solid #fff;outline-offset:3px}#cables{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}.cable{fill:none;stroke-width:2.5;opacity:.8;filter:drop-shadow(0 2px 3px #000)}details{margin-top:14px}summary{cursor:pointer;font-size:12px;color:var(--muted)}#connections{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.connection{display:flex;align-items:center;gap:10px;background:#202d30;padding:7px 10px;border:1px solid var(--line);border-radius:6px;font:11px ui-monospace,monospace}.connection button{border:0;padding:0 5px;background:none;color:var(--red)}.performance{display:grid;grid-template-columns:1.6fr 1fr;gap:25px}.sequence-panel,.scope-panel{min-width:0}.transport{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin-bottom:17px}.transport input[type="number"]{width:64px;background:#202c30;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:7px}.transport input[type="range"]{width:80px;accent-color:var(--teal)}.transport output{color:var(--muted);font-size:11px}#steps{display:grid;grid-template-columns:repeat(8,1fr);gap:7px}.step{padding:7px 4px;background:#1c292c;border:1px solid var(--line);border-radius:6px;text-align:center}.step.active{border-color:var(--teal);background:#2e4a42}.step label{display:block;font-size:9px;margin-bottom:4px}.step select{width:100%;padding:4px 0;border:0;font:11px ui-monospace,monospace;background:transparent}.hint{font-size:10px;color:var(--muted);margin:12px 0}canvas{width:100%;height:180px;background:#0c1315;border:1px solid var(--line);border-radius:9px}#peak.hot{color:var(--red)}.keyboard-panel{margin:8px 0 30px}.keyboard-tools{display:flex;gap:12px;align-items:center;margin-bottom:13px;letter-spacing:0}.keyboard-tools select{font-size:12px;padding:5px 9px}.keyboard-tools span{font-size:11px}#keyboard{display:flex;position:relative;height:124px;max-width:860px}.key{position:relative;flex:1;background:#dfe6dd;color:#45514b;border:1px solid #101719;border-radius:0 0 7px 7px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;font-size:10px;touch-action:none;user-select:none}.key:hover{background:#ecf6ea}.key.black{background:#263236;color:#b4c0bc;position:absolute;width:7%;height:73px;z-index:1;border:2px solid #101719}.key.black:hover{background:#394b4e}.key.down{background:var(--teal);color:#193c31}.key.black.down{background:#57ad97}.key span{pointer-events:none}footer{display:flex;justify-content:space-between;gap:15px;border-top:1px solid var(--line);padding:20px 0 28px;font-size:9px;color:var(--muted);letter-spacing:1px}@media(min-width:1200px){#modules{grid-template-columns:repeat(6,minmax(0,1fr))}}@media(max-width:900px){.app{padding:0 20px}.intro-note{display:none}.performance{grid-template-columns:1fr}.status{display:none}#modules{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:620px){.app{padding:0 12px}header{padding:18px 0}.brand{font-size:12px}.logo{width:35px;height:35px}.header-actions{gap:5px}button,select{padding:8px;font-size:12px}.intro{padding:28px 0}.toolbar{gap:10px}.group{flex-wrap:wrap}#rack{padding:12px}#modules{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.module-head{padding:10px}.controls{padding:10px}.ports{padding:9px}.port{font-size:9px}.section-label{font-size:9px;letter-spacing:.6px}.keyboard-tools span{max-width:200px;font-size:10px}footer{flex-wrap:wrap}.transport label{font-size:9px}.intro p{font-size:12px}.module-head h2{font-size:13px}.module-desc{font-size:9px}#keyboard{height:108px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+/* Precise numeric editing complements the logarithmic sliders. */
+.control-top{align-items:center;gap:5px}.control .param-number{width:78px;min-width:0;height:25px;margin:0;padding:2px 4px;border:1px solid #405154;border-radius:4px;background:#111b1d;color:var(--text);font:11px ui-monospace,monospace;letter-spacing:0;text-align:right;cursor:text}.control-top label{font-size:9px;letter-spacing:.25px}.control input[type="range"]{margin-top:12px}.control .param-number:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+</style></head>
+<body>
+<div class="app">
+<header><a class="brand" href="#"><span class="logo">∿</span><span>MODULAR<span class="brand-sub">SYNTH JS / 1.0.1</span></span></a><div class="header-actions"><span id="audio-status" class="status">Audio sleeping</span><button id="power" class="primary">Enable audio</button><button id="panic" title="Stop notes and mute output">Panic</button></div></header>
+<section class="intro"><div><div class="eyebrow">A LITTLE LAB FOR BIG SOUNDS</div><h1>Follow your curiosity.<br><span>Patch your own sound.</span></h1><p>Build a signal path, shape a waveform, find a happy accident.</p></div><div class="intro-note"><span class="mini-wave">∿ ∿ ∿</span><b>Every connection is a possibility.</b><span>Audio flows through teal ports.<br>Control signals flow through amber ports.</span></div></section>
+<section class="toolbar" aria-label="Patch controls"><div class="group"><label for="preset">PATCH</label><select id="preset"><option value="bass">01 / Acid current</option><option value="soft">02 / Soft orbit</option><option value="space">03 / Cosmic drift</option><option value="blank">04 / Blank canvas</option></select><button id="load-preset">Load</button></div><div class="group"><label class="sr-only" for="module-type">Module type</label><select id="module-type"></select><button id="add">+ Add module</button></div><div class="group"><button id="save">Export patch</button><button id="import">Import patch</button><input id="file" type="file" accept=".json,application/json" hidden></div></section>
+<section class="rack-section"><div class="section-label"><span>01 <b>THE RACK</b></span><span id="rack-count"></span></div><div id="message" role="status">Choose an output port, then an input port to make a connection.</div><div id="rack"><svg id="cables" aria-hidden="true"></svg><div id="modules"></div></div><details id="patch-details"><summary>Patch connections <span id="connection-count"></span></summary><div id="connections"></div></details></section>
+<section class="performance"><div class="sequence-panel"><div class="section-label"><span>02 <b>STEP SEQUENCER</b></span><span>16 STEPS · 1/16 NOTES</span></div><div class="transport"><button id="play" class="primary">▶ Play</button><label for="bpm">TEMPO</label><input id="bpm" type="number" min="30" max="300" value="110"><span>BPM</span><label for="gate">GATE</label><input id="gate" type="range" min=".05" max=".95" step=".05" value=".65"><output id="gate-value">65%</output></div><div id="steps" aria-label="Sequencer notes"></div><p class="hint">Choose a note per step. “—” is a rest. Edits apply on the next Play.</p></div><div class="scope-panel"><div class="section-label"><span>03 <b>OSCILLOSCOPE</b></span><span id="peak">OUTPUT</span></div><canvas id="scope" width="700" height="180" aria-label="Live output waveform"></canvas><p class="hint">Master output after compression.</p></div></section>
+<section class="keyboard-panel"><div class="section-label"><span>04 <b>PLAY SOMETHING</b></span><span>MONOPHONIC · LAST NOTE PRIORITY</span></div><div class="keyboard-tools"><label for="octave">OCTAVE</label><select id="octave"><option value="36">C2</option><option value="48" selected>C3</option><option value="60">C4</option><option value="72">C5</option></select><span>Keys A W S E D F T G Y H U J K · or click / touch</span></div><div id="keyboard"></div></section>
+<footer><span>MODULAR SYNTH JS</span><span>9 module types · Web Audio · No dependencies</span><span>Made for exploration.</span></footer>
+</div><script>
+/* Modular Synth JS v1.0.1 | MIT License */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.ModularSynth = factory();
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const VERSION = '1.0.1';
+  const PATCH_VERSION = '1.0.0'; // File format stays compatible with existing patches.
+  const number = (value, min, max, label) => {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max)
+      throw new RangeError(`${label} must be a finite number between ${min} and ${max}`);
+    return value;
+  };
+  const range = (value, min, max, step = .01, unit = '') => ({value, min, max, step, unit});
+  const choice = (value, values) => ({value, values});
+  const definitions = {
+    oscillator: {label:'Oscillator', description:'Pitched audio source', params:{wave:choice('sawtooth',['sine','triangle','sawtooth','square']), frequency:range(220,20,20000,1,'Hz'), detune:range(0,-2400,2400,1,'ct'), level:range(.5,0,1)}, inputs:{fm:'cv', pitch:'cv'}, outputs:{out:'audio'}},
+    noise: {label:'Noise', description:'White noise source', params:{level:range(.15,0,1)}, inputs:{}, outputs:{out:'audio'}},
+    filter: {label:'Filter', description:'Resonant tone shaping', params:{type:choice('lowpass',['lowpass','highpass','bandpass','notch']), cutoff:range(1600,20,20000,1,'Hz'), resonance:range(1,.1,24,.1)}, inputs:{in:'audio', cutoff:'cv', resonance:'cv'}, outputs:{out:'audio'}},
+    vca: {label:'VCA', description:'Voltage-controlled amplifier', params:{gain:range(0,0,1)}, inputs:{in:'audio', gain:'cv'}, outputs:{out:'audio'}},
+    envelope: {label:'Envelope', description:'ADSR · triggered by note events', params:{attack:range(.015,.001,4,.001,'s'), decay:range(.2,.001,4,.001,'s'), sustain:range(.5,0,1), release:range(.35,.001,8,.001,'s'), amount:range(1,0,10000,.01)}, inputs:{}, outputs:{out:'cv'}},
+    lfo: {label:'LFO', description:'Bipolar modulation source', params:{wave:choice('sine',['sine','triangle','sawtooth','square']), rate:range(4,.01,40,.01,'Hz'), depth:range(20,0,10000,.01)}, inputs:{}, outputs:{out:'cv'}},
+    mixer: {label:'Mixer', description:'Three audio inputs', params:{a:range(.7,0,1), b:range(.7,0,1), c:range(.7,0,1)}, inputs:{a:'audio',b:'audio',c:'audio'}, outputs:{out:'audio'}},
+    delay: {label:'Delay', description:'Echo with internal feedback', params:{time:range(.25,.01,2,.01,'s'), feedback:range(.3,0,.9), mix:range(.25,0,1)}, inputs:{in:'audio'}, outputs:{out:'audio'}},
+    output: {label:'Output', description:'Master · compressor · scope', params:{volume:range(.35,0,1)}, inputs:{in:'audio'}, outputs:{}}
+  };
+  function validateParams(type, params = {}) {
+    const def = definitions[type];
+    if (typeof type !== 'string' || !Object.hasOwn(definitions,type)) throw new TypeError(`Unknown module type: ${type}`);
+    if (!params || typeof params !== 'object' || Array.isArray(params)) throw new TypeError('Parameters must be an object');
+    const result = Object.fromEntries(Object.entries(def.params).map(([k,d]) => [k,d.value]));
+    for (const [key,value] of Object.entries(params)) {
+      const d = def.params[key];
+      if (!Object.hasOwn(def.params,key)) throw new TypeError(`Unknown parameter: ${type}.${key}`);
+      if (d.values ? !d.values.includes(value) : (number(value,d.min,d.max,key), false)) throw new RangeError(`Invalid ${key}`);
+      result[key] = value;
+    }
+    return result;
+  }
+  const validId = id => typeof id === 'string' && /^[a-zA-Z][\w-]{0,63}$/.test(id);
+  class ModularSynth {
+    constructor(options = {}) {
+      if (!options || typeof options !== 'object' || Array.isArray(options)) throw new TypeError('Options must be an object');
+      const AudioContextClass = globalThis.AudioContext || globalThis.webkitAudioContext;
+      if (!options.context && !AudioContextClass) throw new Error('Web Audio is unavailable in this environment');
+      this.context = options.context || new AudioContextClass();
+      this.ownsContext = !options.context;
+      if (this.context.state === 'closed') throw new Error('Audio context is closed');
+      this.modules = new Map(); this.connections = []; this.counter = 0; this.destroyed = false;
+      this.held = []; this.sequenceTimer = null; this.sequenceGeneration = 0; this.sequenceEvents = [];
+      this.master = this.context.createGain(); this.master.gain.value = 1;
+      this.rackOutput = this.context.createGain(); this.rackOutput.connect(this.master);
+      this.compressor = this.context.createDynamicsCompressor();
+      this.compressor.threshold.value = -8; this.compressor.knee.value = 6;
+      this.compressor.ratio.value = 12; this.compressor.attack.value = .003; this.compressor.release.value = .15;
+      this.analyser = this.context.createAnalyser(); this.analyser.fftSize = 2048;
+      this.master.connect(this.compressor); this.compressor.connect(this.analyser);
+      this.analyser.connect(options.destination || this.context.destination);
+    }
+    _alive() { if (this.destroyed) throw new Error('Synth has been destroyed'); }
+    async resume() { this._alive(); if (this.context.state === 'closed') throw new Error('Audio context is closed'); if (this.context.state !== 'running') await this.context.resume(); this._alive(); return this; }
+    create(type, params = {}, id) {
+      this._alive(); const p = validateParams(type,params); if(this.modules.size>=64) throw new RangeError('Maximum 64 modules');
+      if (id === undefined) { do { id = `m${++this.counter}`; } while (this.modules.has(id)); }
+      if (!validId(id) || this.modules.has(id)) throw new TypeError('Module ID must be unique and use letters, numbers, underscores or hyphens');
+      const c = this.context, nodes = [], sources = [], inputs = {}, outputs = {}, controls = {};
+      const node = n => (nodes.push(n), n);
+      const gain = value => { const n = node(c.createGain()); n.gain.value = value; return n; };
+      const m = {id,type,params:p,nodes,sources,inputs,outputs,controls, envelopeEvents:[]};
+      try {
+      if (type === 'oscillator' || type === 'lfo') {
+        const osc = node(c.createOscillator()), amp = gain(type === 'lfo' ? p.depth : p.level);
+        osc.type = p.wave; osc.frequency.value = type === 'lfo' ? p.rate : p.frequency;
+        osc.connect(amp); outputs.out = amp; controls.wave = osc;
+        controls[type === 'lfo' ? 'rate' : 'frequency'] = osc.frequency;
+        controls[type === 'lfo' ? 'depth' : 'level'] = amp.gain;
+        if (type === 'oscillator') { osc.detune.value = p.detune; inputs.fm = osc.frequency; inputs.pitch = osc.detune; controls.detune = osc.detune; }
+        sources.push(osc); osc.start();
+      } else if (type === 'noise') {
+        const source = node(c.createBufferSource()), amp = gain(p.level), buffer = c.createBuffer(1,c.sampleRate*2,c.sampleRate);
+        const data = buffer.getChannelData(0); for (let i=0;i<data.length;i++) data[i] = Math.random()*2-1;
+        source.buffer = buffer; source.loop = true; source.connect(amp); sources.push(source); source.start();
+        outputs.out = amp; controls.level = amp.gain;
+      } else if (type === 'filter') {
+        const f = node(c.createBiquadFilter()); f.type = p.type; f.frequency.value = p.cutoff; f.Q.value = p.resonance;
+        inputs.in = f; inputs.cutoff = f.frequency; inputs.resonance = f.Q; outputs.out = f;
+        controls.type = f; controls.cutoff = f.frequency; controls.resonance = f.Q;
+      } else if (type === 'vca') {
+        const amp = gain(p.gain); inputs.in = amp; inputs.gain = amp.gain; outputs.out = amp; controls.gain = amp.gain;
+      } else if (type === 'envelope') {
+        const source = node(c.createConstantSource()), amp = gain(p.amount); source.offset.value = 0;
+        source.connect(amp); sources.push(source); source.start(); outputs.out = amp;
+        m.envelope = source.offset; controls.amount = amp.gain;
+      } else if (type === 'mixer') {
+        const out = gain(1); outputs.out = out;
+        for (const key of ['a','b','c']) { const amp = gain(p[key]); amp.connect(out); inputs[key] = amp; controls[key] = amp.gain; }
+      } else if (type === 'delay') {
+        const input = gain(1), dry = gain(1-p.mix), wet = gain(p.mix), out = gain(1);
+        const echo = node(c.createDelay(2)), feedback = gain(p.feedback); echo.delayTime.value = p.time;
+        input.connect(dry); dry.connect(out); input.connect(echo); echo.connect(wet); wet.connect(out);
+        echo.connect(feedback); feedback.connect(echo);
+        inputs.in = input; outputs.out = out; controls.time = echo.delayTime; controls.feedback = feedback.gain;
+        m.dry = dry.gain; m.wet = wet.gain;
+      } else if (type === 'output') {
+        const amp = gain(p.volume); inputs.in = amp; amp.connect(this.rackOutput); controls.volume = amp.gain;
+      }
+      this.modules.set(id,m); return m;
+      } catch (error) {
+        this._disposeModule(m);
+        throw error;
+      }
+    }
+    set(id, key, value, time = this.context.currentTime) {
+      this._alive(); const m = this.get(id); validateParams(m.type,{[key]:value});
+      number(time,0,Number.MAX_VALUE,'time'); time=Math.max(time,this.context.currentTime);
+      m.params[key] = value; const target = m.controls[key];
+      if (key === 'wave') target.type = value;
+      else if (m.type === 'filter' && key === 'type') target.type = value;
+      else if (m.type === 'delay' && key === 'mix') {
+        m.dry.cancelScheduledValues(time); m.wet.cancelScheduledValues(time);
+        m.dry.setTargetAtTime(1-value,time,.01); m.wet.setTargetAtTime(value,time,.01);
+      } else if (target) { target.cancelScheduledValues(time); target.setTargetAtTime(value,time,.01); }
+      return this;
+    }
+    get(id) { const m = this.modules.get(id); if (!m) throw new Error(`Module not found: ${id}`); return m; }
+    connect(from, output, to, input, amount = 1) {
+      this._alive(); number(amount,-10000,10000,'Connection amount'); if(this.connections.length>=256) throw new RangeError('Maximum 256 connections');
+      const a = this.get(from), b = this.get(to), outType = definitions[a.type].outputs[output], inType = definitions[b.type].inputs[input];
+      if (!Object.hasOwn(definitions[a.type].outputs,output) || !Object.hasOwn(definitions[b.type].inputs,input) || outType !== inType) throw new TypeError('Connect audio to audio, or CV to CV');
+      if (this.connections.some(x=>x.from===from && x.output===output && x.to===to && x.input===input)) throw new Error('Connection already exists');
+      // User patch cycles are rejected; Delay owns a controlled internal feedback loop.
+      const visits = new Set();
+      const reaches = id => { if (id === from) return true; if (visits.has(id)) return false; visits.add(id); return this.connections.filter(x=>x.from===id).some(x=>reaches(x.to)); };
+      if (reaches(to)) throw new Error('Feedback patch cycles are unsupported; use the Delay module');
+      const cable = this.context.createGain(); cable.gain.value = amount;
+      try {
+        a.outputs[output].connect(cable); cable.connect(b.inputs[input]);
+      } catch (error) {
+        try { a.outputs[output].disconnect(cable); } catch (_) {}
+        cable.disconnect();
+        throw error;
+      }
+      const connection = {from,output,to,input,amount,cable}; this.connections.push(connection); return connection;
+    }
+    disconnect(connection) {
+      const index = this.connections.indexOf(connection); if (index < 0) return false;
+      this.get(connection.from).outputs[connection.output].disconnect(connection.cable);
+      connection.cable.disconnect(); this.connections.splice(index,1); return true;
+    }
+    _disposeModule(m) {
+      for (const source of m.sources) { try { source.stop(); } catch (_) {} }
+      for (const node of m.nodes) node.disconnect();
+    }
+    remove(id) {
+      this._alive(); const m = this.get(id);
+      for (const cable of [...this.connections]) if (cable.from === id || cable.to === id) this.disconnect(cable);
+      this._disposeModule(m); this.modules.delete(id); return this;
+    }
+    _envValue(m,time) {
+      let value = 0;
+      for (const event of m.envelopeEvents) {
+        if (event.time > time) break;
+        const dt = time-event.time;
+        if (event.kind === 'off') value = event.from * Math.max(0,1-dt/event.release);
+        else if (dt < event.attack) value = event.from+(1-event.from)*dt/event.attack;
+        else if (dt < event.attack+event.decay) value = 1+(event.sustain-1)*(dt-event.attack)/event.decay;
+        else value = event.sustain;
+      }
+      return value;
+    }
+    _gate(on,time) {
+      for (const m of this.modules.values()) if (m.envelope) {
+        const p=m.params, level=this._envValue(m,time), param=m.envelope;
+        // Analytic value keeps retriggers continuous even without cancelAndHoldAtTime.
+        param.cancelScheduledValues(time); param.linearRampToValueAtTime(level,time);
+        m.envelopeEvents = m.envelopeEvents.filter(x=>x.time<time);
+        m.envelopeEvents.push({time,kind:on?'on':'off',from:level,...p});
+        if (m.envelopeEvents.length > 256) m.envelopeEvents = m.envelopeEvents.slice(-128);
+        if (on) { param.linearRampToValueAtTime(1,time+p.attack); param.linearRampToValueAtTime(p.sustain,time+p.attack+p.decay); }
+        else param.linearRampToValueAtTime(0,time+p.release);
+      }
+    }
+    _pitch(note,time) {
+      const hz = ModularSynth.midiToFrequency(note);
+      for (const m of this.modules.values()) if (m.type === 'oscillator') {
+        const param=m.controls.frequency; param.cancelScheduledValues(time); param.setTargetAtTime(hz,time,.003);
+      }
+    }
+    noteOn(note, time = this.context.currentTime) {
+      this._alive(); number(note,0,127,'MIDI note'); number(time,0,Number.MAX_VALUE,'time'); time=Math.max(time,this.context.currentTime);
+      this.unmute(); this.held = this.held.filter(n=>n!==note); this.held.push(note); this._pitch(note,time); this._gate(true,time); return this;
+    }
+    noteOff(note, time = this.context.currentTime) {
+      this._alive(); if (note !== undefined) number(note,0,127,'MIDI note'); number(time,0,Number.MAX_VALUE,'time'); time=Math.max(time,this.context.currentTime);
+      const active=this.held.at(-1); this.held = note === undefined ? [] : this.held.filter(n=>n!==note);
+      if (note === undefined || note === active) {
+        if (this.held.length) this._pitch(this.held.at(-1),time); else this._gate(false,time);
+      }
+      return this;
+    }
+    panic() {
+      this._alive(); this.stopSequencer(); this.held=[]; const time=this.context.currentTime;
+      for (const m of this.modules.values()) {
+        if (m.envelope) {
+          const level=this._envValue(m,time);
+          m.envelope.cancelScheduledValues(time); m.envelope.linearRampToValueAtTime(level,time);
+          m.envelope.linearRampToValueAtTime(0,time+.005);
+          m.envelopeEvents=[{kind:'off',time,from:level,release:.005}];
+        }
+        if (m.type==='oscillator') m.controls.frequency.cancelScheduledValues(time);
+      }
+      // Mute continuous patches and echo tails until the next note or sequencer run.
+      this.master.gain.cancelScheduledValues(time); this.master.gain.setTargetAtTime(0,time,.003); return this;
+    }
+    unmute() { this._alive(); this.master.gain.cancelScheduledValues(this.context.currentTime); this.master.gain.setTargetAtTime(1,this.context.currentTime,.005); return this; }
+    startSequencer({steps=[48,48,55,null,48,60,55,null,46,46,53,null,46,58,53,null], bpm=110, gate=.65, onStep}={}) {
+      this._alive(); number(bpm,30,300,'BPM'); number(gate,.05,.95,'Gate');
+      if (!Array.isArray(steps) || !steps.length || steps.length>64) throw new TypeError('Use 1–64 sequencer steps');
+      steps=Array.from(steps); // Own a dense snapshot; edits cannot corrupt a running scheduler.
+      steps.forEach(n=>{if(n!==null) number(n,0,127,'Step note');});
+      if (onStep !== undefined && typeof onStep !== 'function') throw new TypeError('onStep must be a function');
+      this.stopSequencer(); this.unmute(); const generation=++this.sequenceGeneration;
+      let index=0, next=this.context.currentTime+.03; const duration=60/bpm/4;
+      const schedule = () => {
+        if (generation !== this.sequenceGeneration || this.destroyed) return;
+        if (this.context.state !== 'running') { next=this.context.currentTime+.03; return; }
+        if (next < this.context.currentTime) next=this.context.currentTime+.01;
+        while(next < this.context.currentTime+.1) {
+          const step=index%steps.length, note=steps[step], time=next;
+          if (note !== null) { this._pitch(note,time); this._gate(true,time); this._gate(false,time+duration*gate); }
+          if (onStep) { const timer=setTimeout(()=>{this.sequenceEvents=this.sequenceEvents.filter(t=>t!==timer); if(generation===this.sequenceGeneration && this.context.state==='running') onStep(step);},Math.max(0,(time-this.context.currentTime)*1000)); this.sequenceEvents.push(timer); }
+          index++; next+=duration;
+        }
+      };
+      this.sequenceTimer=setInterval(schedule,25); schedule(); return this;
+    }
+    stopSequencer() {
+      clearInterval(this.sequenceTimer); this.sequenceTimer=null; this.sequenceGeneration++;
+      this.sequenceEvents.forEach(clearTimeout); this.sequenceEvents=[];
+      if (!this.destroyed) {
+        const t=this.context.currentTime;
+        for(const m of this.modules.values()) if(m.type==='oscillator') m.controls.frequency.cancelScheduledValues(t);
+        this.held=[]; this._gate(false,t);
+      }
+      return this;
+    }
+    toJSON() { return {version:PATCH_VERSION, modules:[...this.modules.values()].map(({id,type,params})=>({id,type,params:{...params}})),connections:this.connections.map(({from,output,to,input,amount})=>({from,output,to,input,amount}))}; }
+    static validatePatch(patch) {
+      if (!patch || typeof patch!=='object' || patch.version!==PATCH_VERSION || !Array.isArray(patch.modules) || !Array.isArray(patch.connections)) throw new TypeError('Invalid patch or unsupported version');
+      if(patch.modules.length>64 || patch.connections.length>256) throw new RangeError('Patch limit: 64 modules / 256 connections');
+      const map=new Map();
+      for(const m of patch.modules) { if(!m || !validId(m.id) || map.has(m.id)) throw new TypeError('Invalid or duplicate module ID'); validateParams(m.type,m.params); map.set(m.id,m); }
+      const edges=[], keys=new Set();
+      for(const x of patch.connections) {
+        if(!x || !map.has(x.from) || !map.has(x.to)) throw new TypeError('Connection references a missing module');
+        const a=definitions[map.get(x.from).type].outputs[x.output], b=definitions[map.get(x.to).type].inputs[x.input];
+        if(!Object.hasOwn(definitions[map.get(x.from).type].outputs,x.output) || !Object.hasOwn(definitions[map.get(x.to).type].inputs,x.input) || a!==b) throw new TypeError('Invalid connection ports'); number(x.amount,-10000,10000,'Connection amount');
+        const key=JSON.stringify([x.from,x.output,x.to,x.input]); if(keys.has(key)) throw new Error('Duplicate connection'); keys.add(key);
+        const seen=new Set(); const reaches=id=>{if(id===x.from)return true;if(seen.has(id))return false;seen.add(id);return edges.filter(e=>e.from===id).some(e=>reaches(e.to));};
+        if(reaches(x.to))throw new Error('Feedback patch cycles are unsupported'); edges.push(x);
+      }
+      return patch;
+    }
+    loadPatch(patch) {
+      this._alive(); ModularSynth.validatePatch(patch);
+      // Build an isolated rack first. Native node/allocation failures keep the current patch alive.
+      const staged=Object.create(ModularSynth.prototype);
+      Object.assign(staged,{context:this.context,modules:new Map(),connections:[],counter:this.counter,destroyed:false});
+      staged.rackOutput=this.context.createGain(); staged.rackOutput.gain.value=0;
+      try {
+        for(const m of patch.modules)staged.create(m.type,m.params,m.id);
+        for(const x of patch.connections)staged.connect(x.from,x.output,x.to,x.input,x.amount);
+        staged.rackOutput.connect(this.master);
+      } catch (error) {
+        for(const id of [...staged.modules.keys()])staged.remove(id);
+        staged.rackOutput.disconnect();
+        throw error;
+      }
+      this.stopSequencer();
+      for(const id of [...this.modules.keys()])this.remove(id);
+      this.rackOutput.disconnect();
+      this.modules=staged.modules; this.connections=staged.connections;
+      this.rackOutput=staged.rackOutput; this.counter=staged.counter;
+      this.rackOutput.gain.setValueAtTime(1,this.context.currentTime);
+      this.unmute(); return this;
+    }
+    async destroy() {
+      if(this.destroyed)return; this.stopSequencer(); for(const id of [...this.modules.keys()])this.remove(id);
+      this.rackOutput.disconnect(); this.master.disconnect(); this.compressor.disconnect(); this.analyser.disconnect(); this.destroyed=true;
+      if(this.ownsContext && this.context.state!=='closed') await this.context.close();
+    }
+    static midiToFrequency(note) { number(note,0,127,'MIDI note'); return 440*Math.pow(2,(note-69)/12); }
+    static get version() { return VERSION; }
+    static get definitions() { return JSON.parse(JSON.stringify(definitions)); }
+  }
+  return ModularSynth;
+});
+
+</script><script>
+/* Interactive demo for Modular Synth JS. */
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id), defs=ModularSynth.definitions;
+  const names=['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B'];
+  const noteName=n=>names[n%12]+(Math.floor(n/12)-1);
+  const presetPatch=kind=>{
+    if(kind==='blank')return {version:'1.0.0',modules:[{id:'output',type:'output',params:{volume:.35}}],connections:[]};
+    const soft=kind==='soft', space=kind==='space';
+    const modules=[
+      {id:'osc',type:'oscillator',params:{wave:soft?'triangle':'sawtooth',level:.55,detune:0,frequency:130.81}},
+      {id:'filter',type:'filter',params:{cutoff:soft?1500:space?750:350,resonance:soft?1:space?4:8}},
+      {id:'amp',type:'vca',params:{gain:0}},
+      {id:'env',type:'envelope',params:{attack:soft?.12:space?.3:.008,decay:soft?.6:.22,sustain:soft?.65:space?.75:.2,release:soft?.8:space?1.8:.16,amount:.8}},
+      {id:'lfo',type:'lfo',params:{rate:soft?.3:space?.17:2.2,depth:soft?150:space?450:90}},
+      {id:'output',type:'output',params:{volume:.45}}
+    ];
+    const connections=[{from:'osc',output:'out',to:'filter',input:'in',amount:1},{from:'filter',output:'out',to:'amp',input:'in',amount:1},{from:'env',output:'out',to:'amp',input:'gain',amount:1},{from:'lfo',output:'out',to:'filter',input:'cutoff',amount:1},{from:'amp',output:'out',to:'output',input:'in',amount:1}];
+    if(!soft&&!space){modules.push({id:'sweep',type:'envelope',params:{attack:.003,decay:.18,sustain:0,release:.1,amount:2200}});connections.push({from:'sweep',output:'out',to:'filter',input:'cutoff',amount:1});}
+    if(space){modules.push({id:'echo',type:'delay',params:{time:.375,feedback:.5,mix:.35}});connections.pop();connections.push({from:'amp',output:'out',to:'echo',input:'in',amount:1},{from:'echo',output:'out',to:'output',input:'in',amount:1});}
+    return {version:'1.0.0',modules,connections};
+  };
+  let synth, selected=null, playing=false, starting=false, base=48, playRequest=0, patchRequest=0;
+  const pointers=new Map(), heldKeys=new Map();
+  function message(text,error=false){$('message').textContent=text;$('message').classList.toggle('error',error);}
+  function run(fn){try{return fn();}catch(e){message(e.message,true);}}
+  async function enable(){if(!synth)throw new Error('Web Audio is unavailable');await synth.resume();$('power').textContent='Audio enabled';$('audio-status').textContent='Audio running';$('audio-status').classList.add('running');}
+  async function safelyEnable(){try{await enable();return true;}catch(e){message(e.message,true);return false;}}
+  function stop(){playRequest++;starting=false;if(!synth)return;synth.stopSequencer();playing=false;$('play').textContent='▶ Play';document.querySelectorAll('.step.active').forEach(x=>x.classList.remove('active'));}
+  function releaseAll(){heldKeys.clear();pointers.clear();if(synth)synth.noteOff();document.querySelectorAll('.key.down').forEach(x=>x.classList.remove('down'));}
+  function ports(m,dir){const column=document.createElement('div');column.className='ports-col';for(const [name,type] of Object.entries(defs[m.type][dir==='input'?'inputs':'outputs'])){const b=document.createElement('button');b.type='button';b.className=`port ${dir} ${type}`;b.dataset.id=m.id;b.dataset.port=name;b.dataset.dir=dir;b.setAttribute('aria-label',`${m.id} ${name} ${dir}, ${type}`);const jack=document.createElement('span');jack.className='jack';const label=document.createElement('span');label.textContent=name; b.append(jack,label);b.onclick=()=>patchPort(b);column.append(b);}return column;}
+  const logarithmic=new Set(['frequency','cutoff','attack','decay','release','rate','amount','depth']);
+  function sliderValue(value,d,log){
+    if(!log)return value;
+    return 1000*(d.min>0?Math.log(value/d.min)/Math.log(d.max/d.min):Math.log1p(value)/Math.log1p(d.max));
+  }
+  function parameterValue(value,d,log){
+    if(!log)return Number(value);
+    const raw=d.min>0?d.min*Math.pow(d.max/d.min,value/1000):Math.expm1(value/1000*Math.log1p(d.max));
+    const precision=Math.max(0,(String(d.step).split('.')[1]||'').length);
+    return Math.min(d.max,Math.max(d.min,Number(raw.toFixed(precision))));
+  }
+  function validateDemoState(d){
+    if(!d || typeof d!=='object' || !Array.isArray(d.steps) || d.steps.length!==16 || Array.from(d.steps).some(n=>n!==null&&(!Number.isInteger(n)||n<36||n>84)))throw new Error('Use 16 steps with notes from C2 to C6 or rests.');
+    if(!Number.isFinite(d.bpm)||d.bpm<30||d.bpm>300)throw new Error('Tempo must be between 30 and 300 BPM.');
+    if(!Number.isFinite(d.gate)||d.gate<.05||d.gate>.95)throw new Error('Gate must be between 5% and 95%.');
+    return d;
+  }
+  function demoState(){return validateDemoState({steps:[...$('steps').querySelectorAll('select')].map(e=>e.value==='rest'?null:Number(e.value)),bpm:Number($('bpm').value),gate:Number($('gate').value)});}
+  function render(){
+    selected=null;const host=$('modules');host.replaceChildren();
+    for(const m of synth.modules.values()){
+      const card=document.createElement('article');card.className='module';card.dataset.type=m.type;card.dataset.module=m.id;
+      const head=document.createElement('div');head.className='module-head';const title=document.createElement('div');const h=document.createElement('h2');h.textContent=defs[m.type].label;const id=document.createElement('span');id.className='module-id';id.textContent=m.id;title.append(h,id);const remove=document.createElement('button');remove.className='remove';remove.textContent='×';remove.setAttribute('aria-label',`Remove ${m.id}`);remove.onclick=()=>run(()=>{synth.remove(m.id);render();});head.append(title,remove);card.append(head);
+      const controls=document.createElement('div');controls.className='controls';
+      for(const [key,d] of Object.entries(defs[m.type].params)){
+        const row=document.createElement('div');row.className='control';const top=document.createElement('div');top.className='control-top';
+        const label=document.createElement('label');label.htmlFor=`${m.id}-${key}`;label.id=`${m.id}-${key}-label`;
+        const name=()=>key==='resonance'?`resonance (${['lowpass','highpass'].includes(m.params.type)?'dB':'Q'})`:(d.unit?`${key} (${d.unit})`:key);
+        label.textContent=name();top.append(label);
+        const input=document.createElement(d.values?'select':'input');input.id=`${m.id}-${key}`;
+        if(d.values){
+          for(const value of d.values){const o=document.createElement('option');o.value=value;o.textContent=value;input.append(o);}
+          input.value=m.params[key];input.onchange=()=>run(()=>{synth.set(m.id,key,input.value);if(m.type==='filter'&&key==='type')$(`${m.id}-resonance-label`).textContent=`resonance (${['lowpass','highpass'].includes(input.value)?'dB':'Q'})`;});
+        }else{
+          const log=logarithmic.has(key);input.type='range';input.min=log?0:d.min;input.max=log?1000:d.max;input.step=log?'any':d.step;
+          const number=document.createElement('input');number.type='number';number.className='param-number';number.min=d.min;number.max=d.max;number.step='any';number.id=`${m.id}-${key}-number`;
+          number.setAttribute('aria-label',`${m.id} ${key}${d.unit?' in '+d.unit:''}`);number.title=`${d.min}–${d.max}${d.unit?' '+d.unit:''}`;
+          const sync=()=>{number.value=m.params[key];input.value=sliderValue(m.params[key],d,log);input.setAttribute('aria-valuetext',`${m.params[key]}${d.unit?' '+d.unit:''}`);};
+          input.oninput=()=>{run(()=>synth.set(m.id,key,parameterValue(Number(input.value),d,log)));sync();};
+          number.onchange=()=>{run(()=>{if(number.value.trim()==='')throw new Error(`Enter a number for ${key}.`);synth.set(m.id,key,Number(number.value));});sync();};
+          number.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();number.onchange();}};
+          sync();top.append(number);
+        }
+        row.append(top,input);controls.append(row);
+      }
+      const desc=document.createElement('p');desc.className='module-desc';desc.textContent=defs[m.type].description;
+      const portRow=document.createElement('div');portRow.className='ports';portRow.append(ports(m,'input'),ports(m,'output'));card.append(controls,desc,portRow);host.append(card);
+    }
+    $('rack-count').textContent=`${synth.modules.size} MODULES / ${synth.connections.length} CABLES`;renderConnections();requestAnimationFrame(drawCables);
+  }
+  function patchPort(button){
+    if(!selected){selected=button;button.classList.add('selected');message(`Selected ${button.dataset.id}.${button.dataset.port}. Choose a matching ${button.dataset.dir==='output'?'input':'output'} port. Escape cancels.`);return;}
+    if(selected===button){selected.classList.remove('selected');selected=null;message('Connection cancelled.');return;}
+    if(selected.dataset.dir===button.dataset.dir){selected.classList.remove('selected');selected=button;button.classList.add('selected');return;}
+    const a=selected.dataset.dir==='output'?selected:button,b=a===selected?button:selected;
+    run(()=>{synth.connect(a.dataset.id,a.dataset.port,b.dataset.id,b.dataset.port);message(`Connected ${a.dataset.id}.${a.dataset.port} → ${b.dataset.id}.${b.dataset.port}`);});
+    selected.classList.remove('selected');selected=null;renderConnections();drawCables();
+  }
+  function portFor(id,name,dir){return [...document.querySelectorAll('.port')].find(e=>e.dataset.id===id&&e.dataset.port===name&&e.dataset.dir===dir);}
+  function renderConnections(){
+    const host=$('connections');host.replaceChildren();document.querySelectorAll('.port').forEach(x=>x.classList.remove('connected'));
+    synth.connections.forEach(c=>{const row=document.createElement('div');row.className='connection';const text=document.createElement('span');text.textContent=`${c.from}.${c.output} → ${c.to}.${c.input} × ${c.amount}`;const del=document.createElement('button');del.textContent='×';del.setAttribute('aria-label',`Disconnect ${c.from} to ${c.to}`);del.onclick=()=>run(()=>{synth.disconnect(c);renderConnections();drawCables();});row.append(text,del);host.append(row);portFor(c.from,c.output,'output')?.classList.add('connected');portFor(c.to,c.input,'input')?.classList.add('connected');});
+    if(!synth.connections.length)host.textContent='No connections. Start with an oscillator → filter → VCA → output.';
+    $('connection-count').textContent=`(${synth.connections.length})`;$('rack-count').textContent=`${synth.modules.size} MODULES / ${synth.connections.length} CABLES`;
+  }
+  function drawCables(){
+    if(!synth)return;const svg=$('cables'),rect=$('rack').getBoundingClientRect();svg.replaceChildren();svg.setAttribute('viewBox',`0 0 ${rect.width} ${rect.height}`);
+    synth.connections.forEach((c,i)=>{const a=portFor(c.from,c.output,'output')?.querySelector('.jack'),b=portFor(c.to,c.input,'input')?.querySelector('.jack');if(!a||!b)return;const ar=a.getBoundingClientRect(),br=b.getBoundingClientRect();const x1=ar.left+ar.width/2-rect.left,y1=ar.top+ar.height/2-rect.top,x2=br.left+br.width/2-rect.left,y2=br.top+br.height/2-rect.top;const bend=Math.min(70,20+Math.abs(x2-x1)*.13)+(i%3)*6;const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',`M${x1},${y1} C${x1+25},${y1+bend} ${x2-25},${y2+bend} ${x2},${y2}`);path.setAttribute('stroke',defs[synth.get(c.from).type].outputs[c.output]==='cv'?'#f0bc77':'#82d7c0');path.setAttribute('class','cable');svg.append(path);});
+  }
+  const initialSteps=[48,48,55,null,48,60,55,null,46,46,53,null,46,58,53,null];
+  initialSteps.forEach((n,i)=>{const cell=document.createElement('div');cell.className='step';const label=document.createElement('label');label.textContent=String(i+1).padStart(2,'0');label.htmlFor=`step-${i}`;const input=document.createElement('select');input.id=`step-${i}`;input.setAttribute('aria-label',`Step ${i+1} note`);for(const value of [null,...Array.from({length:49},(_,j)=>j+36)]){const o=document.createElement('option');o.value=value===null?'rest':value;o.textContent=value===null?'—':noteName(value);input.append(o);}input.value=n===null?'rest':n;cell.append(label,input);$('steps').append(cell);});
+  function updateKey(note,down){const el=[...document.querySelectorAll('.key')].find(x=>Number(x.dataset.note)===note);if(el)el.classList.toggle('down',down);}
+  function keyboard(){
+    releaseAll();const host=$('keyboard');host.replaceChildren();const white=[0,2,4,5,7,9,11,12],black=[{n:1,x:1},{n:3,x:2},{n:6,x:4},{n:8,x:5},{n:10,x:6}];
+    for(const n of [...white,...black.map(x=>x.n)]){const b=document.createElement('button');b.className='key';b.dataset.note=base+n;b.setAttribute('aria-label',`Play ${noteName(base+n)}`);if(black.some(x=>x.n===n)){b.classList.add('black');b.style.left=`${black.find(x=>x.n===n).x*12.5-3.5}%`;}const label=document.createElement('span');label.textContent=noteName(base+n);b.append(label);
+      b.onpointerdown=async e=>{e.preventDefault();b.setPointerCapture(e.pointerId);const token={note:base+n};pointers.set(e.pointerId,token);if(await safelyEnable() && pointers.get(e.pointerId)===token){if(playing||starting)stop();synth.noteOn(token.note);updateKey(token.note,true);}};
+      const off=e=>{const token=pointers.get(e.pointerId);if(!token)return;pointers.delete(e.pointerId);if(![...pointers.values()].some(t=>t.note===token.note)&&![...heldKeys.values()].some(t=>t.note===token.note)){run(()=>synth.noteOff(token.note));updateKey(token.note,false);}};
+      b.onpointerup=off;b.onpointercancel=off;b.onlostpointercapture=off;host.append(b);
+    }
+  }
+  const keyMap={a:0,w:1,s:2,e:3,d:4,f:5,t:6,g:7,y:8,h:9,u:10,j:11,k:12};
+  window.addEventListener('keydown',async e=>{
+    if(e.key==='Escape'){if(selected){selected.classList.remove('selected');selected=null;message('Connection cancelled.');}return;}
+    if(e.repeat||e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName))return;
+    const key=e.key.toLowerCase();if(keyMap[key]===undefined||heldKeys.has(key))return;e.preventDefault();const token={note:base+keyMap[key]};heldKeys.set(key,token);
+    if(await safelyEnable()&&heldKeys.get(key)===token){if(playing||starting)stop();synth.noteOn(token.note);updateKey(token.note,true);}
+  });
+  window.addEventListener('keyup',e=>{const key=e.key.toLowerCase(),token=heldKeys.get(key);if(!token)return;heldKeys.delete(key);if(![...heldKeys.values()].some(t=>t.note===token.note)&&![...pointers.values()].some(t=>t.note===token.note)){run(()=>synth.noteOff(token.note));updateKey(token.note,false);}});
+  window.addEventListener('blur',()=>{releaseAll();stop();});document.addEventListener('visibilitychange',()=>{if(document.hidden){releaseAll();stop();}});
+  $('power').onclick=safelyEnable;$('panic').onclick=()=>run(()=>{stop();releaseAll();synth.panic();message('Output muted. Play a note or start the sequencer to resume.');});
+  $('add').onclick=()=>run(()=>{if(synth.modules.size>=64)throw new Error('Maximum 64 modules');synth.create($('module-type').value);render();message('Module added. Patch its ports to connect it.');});
+  $('load-preset').onclick=()=>run(()=>{patchRequest++;stop();releaseAll();synth.loadPatch(presetPatch($('preset').value));render();message('Patch loaded. Enable audio and play the keyboard or sequencer.');});
+  $('play').onclick=async()=>{
+    if(playing||starting){stop();return;}
+    const request=++playRequest;starting=true;$('play').textContent='■ Cancel';
+    if(!await safelyEnable()){if(request===playRequest)stop();return;}
+    if(request!==playRequest)return;
+    try{releaseAll();synth.startSequencer({...demoState(),onStep:i=>document.querySelectorAll('.step').forEach((e,j)=>e.classList.toggle('active',i===j))});starting=false;playing=true;$('play').textContent='■ Stop';}
+    catch(error){stop();message(error.message,true);}
+  };
+  $('gate').oninput=()=>{$('gate-value').textContent=Math.round(Number($('gate').value)*100)+'%';};$('octave').onchange=()=>{base=Number($('octave').value);keyboard();};
+  $('save').onclick=()=>run(()=>{const settings=demoState(),patch=synth.toJSON();patch.demo=settings;const url=URL.createObjectURL(new Blob([JSON.stringify(patch,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='modular-synth-patch.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);message('Patch exported as JSON.');});
+  $('import').onclick=()=>$('file').click();
+  $('file').onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;const request=++patchRequest;
+    try{
+      if(file.size>1024*1024)throw new Error('Patch file is too large (maximum 1 MB)');
+      const text=await file.text();if(request!==patchRequest)return;
+      const patch=JSON.parse(text);ModularSynth.validatePatch(patch);
+      if(patch.demo!==undefined)validateDemoState(patch.demo);
+      stop();releaseAll();synth.loadPatch(patch);
+      if(patch.demo){patch.demo.steps.forEach((n,i)=>{$(`step-${i}`).value=n===null?'rest':n;});$('bpm').value=patch.demo.bpm;$('gate').value=patch.demo.gate;$('gate').oninput();}
+      render();message('Patch imported.');
+    }catch(error){if(request===patchRequest)message(error.message,true);}
+    finally{if(request===patchRequest)e.target.value='';}
+  };
+  for(const [type,def] of Object.entries(defs)){const o=document.createElement('option');o.value=type;o.textContent=def.label;$('module-type').append(o);}
+  try{synth=new ModularSynth();synth.loadPatch(presetPatch('bass'));synth.context.addEventListener('statechange',()=>{$('audio-status').textContent=synth.context.state==='running'?'Audio running':'Audio sleeping';$('audio-status').classList.toggle('running',synth.context.state==='running');$('power').textContent=synth.context.state==='running'?'Audio enabled':'Enable audio';});render();keyboard();}catch(e){message(e.message,true);document.querySelectorAll('button').forEach(x=>x.disabled=true);}
+  const rackObserver=typeof ResizeObserver==='function'?new ResizeObserver(drawCables):null;
+  rackObserver?.observe($('rack'));window.addEventListener('resize',drawCables);
+  const canvas=$('scope'),ctx=canvas.getContext('2d'),data=new Float32Array(2048);
+  let scopeFrame;
+  function scope(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle='#223639';ctx.lineWidth=1;ctx.beginPath();for(let i=1;i<8;i++){const x=i*canvas.width/8;ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);}for(let i=1;i<4;i++){const y=i*canvas.height/4;ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);}ctx.stroke();
+    if(synth)synth.analyser.getFloatTimeDomainData(data);ctx.strokeStyle='#82d7c0';ctx.lineWidth=1.8;ctx.beginPath();let peak=0;for(let i=0;i<data.length;i++){const x=i/(data.length-1)*canvas.width,y=canvas.height/2-data[i]*canvas.height*.43;peak=Math.max(peak,Math.abs(data[i]));if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();$('peak').textContent=peak>.98?'HIGH LEVEL':peak<.0001?'SILENT':`${(20*Math.log10(peak)).toFixed(1)} dBFS`;$('peak').classList.toggle('hot',peak>.98);scopeFrame=requestAnimationFrame(scope);
+  }scope();
+  window.addEventListener('pagehide',e=>{patchRequest++;stop();releaseAll();cancelAnimationFrame(scopeFrame);if(!e.persisted){rackObserver?.disconnect();synth?.destroy();}});
+  window.addEventListener('pageshow',e=>{if(e.persisted){drawCables();scope();}});
+})();
+
+</script>
+</body></html>

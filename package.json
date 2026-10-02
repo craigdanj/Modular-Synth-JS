@@ -1,0 +1,22 @@
+{
+  "name": "modular-synth-js",
+  "version": "1.0.1",
+  "description": "Dependency-free monophonic modular synthesizer for Web Audio",
+  "main": "modular-synth.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/engine.test.cjs tests/demo.test.cjs"
+  },
+  "files": [
+    "modular-synth.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "web-audio",
+    "synthesizer",
+    "modular",
+    "audio",
+    "synth"
+  ]
+}
